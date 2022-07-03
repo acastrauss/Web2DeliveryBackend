@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models.Users
 {
-    public class Admin : User
+    public class Admin : IUser
     {
         public Admin(Admin rhs) : base(rhs)
         {
@@ -14,11 +14,11 @@ namespace Models.Users
         }
 
         public Admin(
-            string username, string email, string password,
+            long id, string username, string email, string password,
             string firstName, string lastName, DateTime dateOfBirth,
             string address, string picturePath)
             : base(
-                  username, email, password,
+                  id, username, email, password,
                   firstName, lastName, dateOfBirth,
                   address, picturePath, UserType.ADMIN)
         {}

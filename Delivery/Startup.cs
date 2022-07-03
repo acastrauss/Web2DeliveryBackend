@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,6 +28,11 @@ namespace Delivery
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddDbContext<DataLayer.DBModels.DeliveryDBContext>(
+                options =>
+                options.UseSqlServer("Server=DESKTOP-RA6QVFS;Database=DeliveryDB;Trusted_Connection=True;")
+                );
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -48,6 +54,7 @@ namespace Delivery
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

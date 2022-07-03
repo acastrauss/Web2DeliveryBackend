@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Models.Users
 {
-    public class Deliverer : User
+    public class Deliverer : IUser
     {
-        public List<Deliveries.Delivery> NewDeliveries { get; set; }
-        public List<Deliveries.Delivery> MyDeliveries { get; set; }
-        public Deliveries.Delivery CurrentDelivery { get; set; }
+        public List<Deliveries.Purchase> NewDeliveries { get; set; }
+        public List<Deliveries.Purchase> MyDeliveries { get; set; }
+        public Deliveries.Purchase CurrentDelivery { get; set; }
 
         public bool Verified { get; set; }
 
@@ -23,27 +23,27 @@ namespace Models.Users
         }
 
         public Deliverer(
-            string username, string email, string password,
+            long id, string username, string email, string password,
             string firstName, string lastName, DateTime dateOfBirth,
             string address, string picturePath, bool verified = false,
-            List<Deliveries.Delivery> myDeliveries = null,
-            List<Deliveries.Delivery> newDeliveries = null,
-            Deliveries.Delivery currentDelivery = null
+            List<Deliveries.Purchase> myDeliveries = null,
+            List<Deliveries.Purchase> newDeliveries = null,
+            Deliveries.Purchase currentDelivery = null
             ) :
             base(
-                username, email, password, firstName,
+                id, username, email, password, firstName,
                 lastName, dateOfBirth, address, picturePath, UserType.DELIVERER)
         {
             Verified = verified;
 
             if(myDeliveries == null)
             {
-                myDeliveries = new List<Deliveries.Delivery>();
+                myDeliveries = new List<Deliveries.Purchase>();
             }
 
             if(newDeliveries == null)
             {
-                newDeliveries = new List<Deliveries.Delivery>();
+                newDeliveries = new List<Deliveries.Purchase>();
             }
 
             NewDeliveries = newDeliveries;
