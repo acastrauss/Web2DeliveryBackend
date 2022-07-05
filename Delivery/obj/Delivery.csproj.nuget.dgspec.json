@@ -36,7 +36,11 @@
         "frameworks": {
           "net5.0": {
             "targetAlias": "net5.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "D:\\web2_proj\\delivery\\Delivery\\Models\\Models.csproj": {
+                "projectPath": "D:\\web2_proj\\delivery\\Delivery\\Models\\Models.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -53,15 +57,19 @@
               "target": "Package",
               "version": "[3.1.12, )"
             },
+            "Microsoft.EntityFrameworkCore.Proxies": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
-              "version": "[3.1.12, )"
+              "version": "[5.0.0, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[3.1.12, )"
+              "version": "[5.0.0, )"
             }
           },
           "imports": [

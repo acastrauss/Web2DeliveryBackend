@@ -27,7 +27,6 @@ namespace Delivery
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddDbContext<DataLayer.DBModels.DeliveryDBContext>(
                 options =>
                 options.UseSqlServer("Server=DESKTOP-RA6QVFS;Database=DeliveryDB;Trusted_Connection=True;")

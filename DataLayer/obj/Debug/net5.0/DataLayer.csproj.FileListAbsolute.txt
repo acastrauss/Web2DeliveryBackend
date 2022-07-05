@@ -13,3 +13,6 @@ D:\web2_proj\delivery\Delivery\DataLayer\obj\Debug\net5.0\DataLayer.dll
 D:\web2_proj\delivery\Delivery\DataLayer\obj\Debug\net5.0\ref\DataLayer.dll
 D:\web2_proj\delivery\Delivery\DataLayer\obj\Debug\net5.0\DataLayer.pdb
 D:\web2_proj\delivery\Delivery\DataLayer\obj\Debug\net5.0\DataLayer.genruntimeconfig.cache
+D:\web2_proj\delivery\Delivery\DataLayer\bin\Debug\net5.0\Models.dll
+D:\web2_proj\delivery\Delivery\DataLayer\bin\Debug\net5.0\Models.pdb
+D:\web2_proj\delivery\Delivery\DataLayer\obj\Debug\net5.0\DataLayer.csproj.CopyComplete

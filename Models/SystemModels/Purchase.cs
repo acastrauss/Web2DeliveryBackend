@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.Deliveries
+namespace Models.SystemModels
 {
     public enum PurhaseStatus
     {
@@ -18,6 +18,7 @@ namespace Models.Deliveries
     public class Purchase
     {
         public Purchase(
+            int id,
             List<Product> deliveryItems, float totalPrice,
             string comment, string address, PurhaseStatus status = PurhaseStatus.ORDERED)
         {
@@ -25,7 +26,7 @@ namespace Models.Deliveries
             TotalPrice = totalPrice;
             Comment = comment;
             Address = address;
-            Id = Guid.NewGuid();
+            Id = id;
             Status = status;
         }
 
@@ -48,13 +49,13 @@ namespace Models.Deliveries
         public float TotalPrice { get; private set; }
         public String Comment { get; set; }
         public String Address { get; set; }
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public PurhaseStatus Status { get; set; }
 
         public float CalculateTotalPrice()
         {
             float totalPrice = 0;
-            PurchaseItems.ForEach(di => totalPrice += di.PricePerOne * di.Quantity);
+            PurchaseItems.ForEach(di => totalPrice += di.Price);
             totalPrice += DeliveryPrice;
             return totalPrice;
         }
@@ -64,8 +65,7 @@ namespace Models.Deliveries
             return
                 PurchaseItems.Count != 0 &&
                 TotalPrice != 0 &&
-                !String.IsNullOrEmpty(Address) && !String.IsNullOrWhiteSpace(Address) &&
-                Id != Guid.Empty;
+                !String.IsNullOrEmpty(Address) && !String.IsNullOrWhiteSpace(Address);
         }
     }
 }

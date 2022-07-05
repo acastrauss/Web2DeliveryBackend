@@ -2,9 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-// Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
-// If you have enabled NRTs for your project, then un-comment the following line:
-// #nullable disable
+#nullable disable
 
 namespace DataLayer.DBModels
 {
@@ -19,28 +17,34 @@ namespace DataLayer.DBModels
         {
         }
 
-        public virtual DbSet<Admin> Admin { get; set; }
-        public virtual DbSet<ConsistOf> ConsistOf { get; set; }
-        public virtual DbSet<Deliverer> Deliverer { get; set; }
-        public virtual DbSet<Iuser> Iuser { get; set; }
-        public virtual DbSet<Product> Product { get; set; }
-        public virtual DbSet<Purchase> Purchase { get; set; }
-        public virtual DbSet<Purchaser> Purchaser { get; set; }
+        public virtual DbSet<Admin> Admins { get; set; }
+        public virtual DbSet<ConsistOf> ConsistOfs { get; set; }
+        public virtual DbSet<Deliverer> Deliverers { get; set; }
+        public virtual DbSet<Iuser> Iusers { get; set; }
+        public virtual DbSet<Product> Products { get; set; }
+        public virtual DbSet<Purchase> Purchases { get; set; }
+        public virtual DbSet<Purchaser> Purchasers { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
                 optionsBuilder.UseSqlServer("Server=DESKTOP-RA6QVFS;Database=DeliveryDB;Trusted_Connection=True;");
             }
+
+            optionsBuilder.UseLazyLoadingProxies();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
             modelBuilder.Entity<Admin>(entity =>
             {
                 entity.HasKey(e => e.UserId);
+
+                entity.ToTable("Admin");
 
                 entity.Property(e => e.UserId).ValueGeneratedNever();
 
@@ -52,14 +56,16 @@ namespace DataLayer.DBModels
 
             modelBuilder.Entity<ConsistOf>(entity =>
             {
+                entity.ToTable("ConsistOf");
+
                 entity.HasOne(d => d.Product)
-                    .WithMany(p => p.ConsistOf)
+                    .WithMany(p => p.ConsistOfs)
                     .HasForeignKey(d => d.ProductId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ConsistOf_Product");
 
                 entity.HasOne(d => d.Purchase)
-                    .WithMany(p => p.ConsistOf)
+                    .WithMany(p => p.ConsistOfs)
                     .HasForeignKey(d => d.PurchaseId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ConsistOf_Purchase");
@@ -69,10 +75,12 @@ namespace DataLayer.DBModels
             {
                 entity.HasKey(e => e.UserId);
 
+                entity.ToTable("Deliverer");
+
                 entity.Property(e => e.UserId).ValueGeneratedNever();
 
                 entity.HasOne(d => d.ApprovedFromNavigation)
-                    .WithMany(p => p.Deliverer)
+                    .WithMany(p => p.Deliverers)
                     .HasForeignKey(d => d.ApprovedFrom)
                     .HasConstraintName("FK_Deliverer_Admin");
 
@@ -86,79 +94,91 @@ namespace DataLayer.DBModels
             {
                 entity.ToTable("IUser");
 
-                entity.HasIndex(e => e.Email)
+                entity.HasIndex(e => e.Email, "IX_IUser_Email")
                     .IsUnique();
 
-                entity.HasIndex(e => e.Username)
+                entity.HasIndex(e => e.Username, "IX_IUser_Username")
                     .IsUnique();
 
                 entity.Property(e => e.Address)
                     .IsRequired()
                     .HasMaxLength(50)
-                    .IsFixedLength();
+                    .IsFixedLength(true);
 
                 entity.Property(e => e.DateOfBirth).HasColumnType("date");
 
                 entity.Property(e => e.Email)
                     .IsRequired()
                     .HasMaxLength(60)
-                    .IsFixedLength();
+                    .IsFixedLength(true);
 
                 entity.Property(e => e.FirstName)
                     .IsRequired()
                     .HasMaxLength(30)
-                    .IsFixedLength();
+                    .IsFixedLength(true);
 
                 entity.Property(e => e.LastName)
                     .IsRequired()
                     .HasMaxLength(30)
-                    .IsFixedLength();
+                    .IsFixedLength(true);
 
                 entity.Property(e => e.Password)
                     .IsRequired()
                     .HasMaxLength(64)
-                    .IsFixedLength();
+                    .IsFixedLength(true);
 
                 entity.Property(e => e.PicturePath)
                     .IsRequired()
                     .HasMaxLength(200)
-                    .IsFixedLength();
+                    .IsFixedLength(true);
 
                 entity.Property(e => e.Username)
                     .IsRequired()
                     .HasMaxLength(30)
-                    .IsFixedLength();
+                    .IsFixedLength(true);
             });
 
             modelBuilder.Entity<Product>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.ToTable("Product");
 
-                entity.HasOne(d => d.IdNavigation)
-                    .WithOne(p => p.Product)
-                    .HasForeignKey<Product>(d => d.Id)
+                entity.Property(e => e.Ingredients)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(30)
+                    .IsFixedLength(true);
+
+                entity.HasOne(d => d.AddedByNavigation)
+                    .WithMany(p => p.Products)
+                    .HasForeignKey(d => d.AddedBy)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Product_Admin");
             });
 
             modelBuilder.Entity<Purchase>(entity =>
             {
+                entity.ToTable("Purchase");
+
                 entity.Property(e => e.Comment)
                     .HasMaxLength(100)
-                    .IsFixedLength();
+                    .IsFixedLength(true);
 
-                entity.Property(e => e.DeliverTo)
+                entity.Property(e => e.DeliverToAddress)
                     .IsRequired()
                     .HasMaxLength(50)
-                    .IsFixedLength();
+                    .IsFixedLength(true);
 
                 entity.HasOne(d => d.DeliveredByNavigation)
-                    .WithMany(p => p.Purchase)
+                    .WithMany(p => p.Purchases)
                     .HasForeignKey(d => d.DeliveredBy)
                     .HasConstraintName("FK_Purchase_Deliverer");
 
                 entity.HasOne(d => d.DeliveredToNavigation)
-                    .WithMany(p => p.Purchase)
+                    .WithMany(p => p.Purchases)
                     .HasForeignKey(d => d.DeliveredTo)
                     .HasConstraintName("FK_Purchase_Purchaser");
             });
@@ -167,12 +187,15 @@ namespace DataLayer.DBModels
             {
                 entity.HasKey(e => e.UserId);
 
+                entity.ToTable("Purchaser");
+
                 entity.Property(e => e.UserId).ValueGeneratedNever();
 
                 entity.HasOne(d => d.User)
                     .WithOne(p => p.Purchaser)
                     .HasForeignKey<Purchaser>(d => d.UserId)
-                    .HasConstraintName("FK_Purchaser_Purchaser");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Purchaser_IUser");
             });
 
             OnModelCreatingPartial(modelBuilder);

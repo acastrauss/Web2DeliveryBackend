@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 
-// Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
-// If you have enabled NRTs for your project, then un-comment the following line:
-// #nullable disable
+#nullable disable
 
 namespace DataLayer.DBModels
 {
-    public partial class Admin
+    public partial class Admin : Models.IDBModels.IDBModel
     {
         public Admin()
         {
-            Deliverer = new HashSet<Deliverer>();
+            Deliverers = new HashSet<Deliverer>();
+            Products = new HashSet<Product>();
         }
 
         public int UserId { get; set; }
 
         public virtual Iuser User { get; set; }
-        public virtual Product Product { get; set; }
-        public virtual ICollection<Deliverer> Deliverer { get; set; }
+        public virtual ICollection<Deliverer> Deliverers { get; set; }
+        public virtual ICollection<Product> Products { get; set; }
     }
 }

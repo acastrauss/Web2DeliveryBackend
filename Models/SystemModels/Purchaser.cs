@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.Users
+namespace Models.SystemModels
 {
     public class Purchaser : IUser
     {
-        public Deliveries.Purchase CurrentDelivery { get; set; }
-        public List<Deliveries.Purchase> PreviousDeliveries { get; set; }
+        public Purchase CurrentDelivery { get; set; }
+        public List<Purchase> PreviousPurchases { get; set; }
 
         public Purchaser(Purchaser rhs) : base(rhs)
         {
             Type = UserType.CONSUMER;
-            PreviousDeliveries = rhs.PreviousDeliveries;
+            PreviousPurchases = rhs.PreviousPurchases;
             CurrentDelivery = rhs.CurrentDelivery;
         }
 
@@ -22,17 +22,17 @@ namespace Models.Users
             long id, string username, string email, string password,
             string firstName, string lastName, DateTime dateOfBirth,
             string address, string picturePath,
-            List<Deliveries.Purchase> previousDeliveries = null,
-            Deliveries.Purchase currentDelivery = null):
+            List<Purchase> previousDeliveries = null,
+            Purchase currentDelivery = null):
             base(id, username, email, password, firstName,
                 lastName, dateOfBirth, address, picturePath, UserType.CONSUMER)
         {
             if(previousDeliveries == null)
             {
-                previousDeliveries = new List<Deliveries.Purchase>();
+                previousDeliveries = new List<Purchase>();
             }
 
-            PreviousDeliveries = previousDeliveries;
+            PreviousPurchases = previousDeliveries;
 
             CurrentDelivery = null;
         }

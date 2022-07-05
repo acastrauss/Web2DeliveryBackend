@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 
-// Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
-// If you have enabled NRTs for your project, then un-comment the following line:
-// #nullable disable
+#nullable disable
 
 namespace DataLayer.DBModels
 {
-    public partial class Product
+    public partial class Product : Models.IDBModels.IDBModel
     {
         public Product()
         {
-            ConsistOf = new HashSet<ConsistOf>();
+            ConsistOfs = new HashSet<ConsistOf>();
         }
 
         public int Id { get; set; }
         public int AddedBy { get; set; }
+        public float Price { get; set; }
+        public string Name { get; set; }
+        public string Ingredients { get; set; }
 
-        public virtual Admin IdNavigation { get; set; }
-        public virtual ICollection<ConsistOf> ConsistOf { get; set; }
+        public virtual Admin AddedByNavigation { get; set; }
+        public virtual ICollection<ConsistOf> ConsistOfs { get; set; }
     }
 }
