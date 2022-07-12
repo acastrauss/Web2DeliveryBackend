@@ -13,7 +13,7 @@ namespace Models.SystemModels
 
         public Purchaser(Purchaser rhs) : base(rhs)
         {
-            Type = UserType.CONSUMER;
+            UType = UserType.PURCHASER;
             PreviousPurchases = rhs.PreviousPurchases;
             CurrentDelivery = rhs.CurrentDelivery;
         }
@@ -25,7 +25,7 @@ namespace Models.SystemModels
             List<Purchase> previousDeliveries = null,
             Purchase currentDelivery = null):
             base(id, username, email, password, firstName,
-                lastName, dateOfBirth, address, picturePath, UserType.CONSUMER)
+                lastName, dateOfBirth, address, picturePath, UserType.PURCHASER)
         {
             if(previousDeliveries == null)
             {

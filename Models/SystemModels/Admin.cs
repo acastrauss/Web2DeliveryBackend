@@ -13,7 +13,7 @@ namespace Models.SystemModels
 
         public Admin(Admin rhs) : base(rhs)
         {
-            Type = UserType.ADMIN;
+            UType = UserType.ADMIN;
         }
 
         public Admin(

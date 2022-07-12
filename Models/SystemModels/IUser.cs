@@ -10,7 +10,7 @@ namespace Models.SystemModels
     {
         ADMIN = 0,
         DELIVERER = 1,
-        CONSUMER = 2
+        PURCHASER = 2
     }
 
     public static class InvalidDate
@@ -18,7 +18,7 @@ namespace Models.SystemModels
         public static DateTime InvalidBirthDate = DateTime.Now.AddDays(200);
     }
 
-    public abstract class IUser
+    public class IUser
     {
         public long Id { get; set; }
         public String Username { get; set; }
@@ -30,7 +30,9 @@ namespace Models.SystemModels
         public String Address { get; set; }
         public String PicturePath { get; set; }
 
-        public UserType Type { get; set; }
+        public UserType UType { get; set; }
+
+        public IUser() { }
 
         public IUser(
             long id, string username, string email, string password,
@@ -46,7 +48,7 @@ namespace Models.SystemModels
             DateOfBirth = dateOfBirth;
             Address = address;
             PicturePath = picturePath;
-            Type = userType;
+            UType = userType;
         }
 
         public IUser(IUser rhs)
@@ -60,7 +62,7 @@ namespace Models.SystemModels
             DateOfBirth = rhs.DateOfBirth;
             Address = rhs.Address;
             PicturePath = rhs.PicturePath;
-            Type = rhs.Type;
+            UType = rhs.UType;
         }
 
         public bool IsValid()

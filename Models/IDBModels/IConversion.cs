@@ -14,6 +14,7 @@ namespace Models.IDBModels
         SystemModels.Product ConvertProductSystem(IDBModel model);
         SystemModels.Purchase ConvertPurchaseSystem(IDBModel model);
         SystemModels.Purchaser ConvertPurchaserSystem(IDBModel model);
+        SystemModels.IUser ConvertIUserSystem(IDBModel model);
         #endregion
 
         #region DB_Conversion
@@ -22,6 +23,7 @@ namespace Models.IDBModels
         IDBModel ConvertProductDB(SystemModels.Product model);
         IDBModel ConvertPurchaseDB(SystemModels.Purchase model);
         IDBModel ConvertPurchaserDB(SystemModels.Purchaser model);
+        IDBModel ConvertIUserDB(SystemModels.IUser model);
         #endregion
 
     }

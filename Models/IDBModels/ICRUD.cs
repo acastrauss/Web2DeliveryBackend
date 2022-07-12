@@ -8,10 +8,12 @@ namespace Models.IDBModels
 {
     public interface ICRUD
     {
-        int Create(IDBModel model);
+
+
+        IDBModel Create(IDBModel model);
         IDBModel ReadById(int id);
         ICollection<IDBModel> ReadAll();
-        int UpdateModel(IDBModel model);
-        int DeleteModel(int id);
+        IDBModel UpdateModel(IDBModel model);
+        IDBModel DeleteModel(int id);
     }
 }

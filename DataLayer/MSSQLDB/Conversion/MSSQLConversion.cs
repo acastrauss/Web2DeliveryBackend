@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Models.IDBModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -44,14 +45,14 @@ namespace DataLayer.MSSQLDB.Conversion
 
             return new Models.SystemModels.Admin(
                     dbAdmin.User.Id,
-                    dbAdmin.User.Username,
-                    dbAdmin.User.Email,
-                    dbAdmin.User.Password,
-                    dbAdmin.User.FirstName,
-                    dbAdmin.User.LastName,
+                    dbAdmin.User.Username.Trim(),
+                    dbAdmin.User.Email.Trim(),
+                    dbAdmin.User.Password.Trim(),
+                    dbAdmin.User.FirstName.Trim(),
+                    dbAdmin.User.LastName.Trim(),
                     dbAdmin.User.DateOfBirth,
-                    dbAdmin.User.Address,
-                    dbAdmin.User.PicturePath,
+                    dbAdmin.User.Address.Trim(),
+                    dbAdmin.User.PicturePath.Trim(),
                     delivs,
                     prods
                 );
@@ -92,18 +93,58 @@ namespace DataLayer.MSSQLDB.Conversion
 
             return new Models.SystemModels.Deliverer(
                 deliverer.User.Id,
-                deliverer.User.Username,
-                deliverer.User.Email,
-                deliverer.User.Password,
-                deliverer.User.FirstName,
-                deliverer.User.LastName,
+                deliverer.User.Username.Trim(),
+                deliverer.User.Email.Trim(),
+                deliverer.User.Password.Trim(),
+                deliverer.User.FirstName.Trim(),
+                deliverer.User.LastName.Trim(),
                 deliverer.User.DateOfBirth,
-                deliverer.User.Address,
-                deliverer.User.PicturePath,
+                deliverer.User.Address.Trim(),
+                deliverer.User.PicturePath.Trim(),
                 (Models.SystemModels.ApprovalStatus)deliverer.ApprovalStatus,
                 purchs,
                 currentPurch
             );
+        }
+
+        public IDBModel ConvertIUserDB(Models.SystemModels.IUser model)
+        {
+            return new DBModels.Iuser()
+            {
+                Address = model.Address,
+                DateOfBirth = model.DateOfBirth,
+                Email = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Password = model.Password,
+                PicturePath = "Nista",
+                Username = model.Username,
+                UserType = (int)model.UType
+            };
+        }
+
+        public Models.SystemModels.IUser ConvertIUserSystem(IDBModel model)
+        {
+            var userDb = model as DBModels.Iuser;
+
+            if (userDb == null)
+            {
+                throw new MSSQLConversionException();
+            }
+
+            return new Models.SystemModels.IUser()
+            {
+                Address = userDb.Address.Trim(),
+                DateOfBirth = userDb.DateOfBirth,
+                Email = userDb.Email.Trim(),
+                FirstName = userDb.FirstName.Trim(),
+                Id = userDb.Id,
+                LastName = userDb.LastName.Trim(),
+                Password = "", // do not send password
+                PicturePath = userDb.PicturePath.Trim(),
+                Username = userDb.Username.Trim(),
+                UType = (Models.SystemModels.UserType)userDb.UserType
+            };
         }
 
         public Models.IDBModels.IDBModel ConvertProductDB(Models.SystemModels.Product model)
@@ -126,7 +167,7 @@ namespace DataLayer.MSSQLDB.Conversion
                 throw new MSSQLConversionException();
             }
 
-            return new Models.SystemModels.Product(product.Name, product.Price, product.Ingredients);
+            return new Models.SystemModels.Product(product.Name.Trim(), product.Price, product.Ingredients.Trim());
         }
 
         public Models.IDBModels.IDBModel ConvertPurchaseDB(Models.SystemModels.Purchase model)
@@ -187,14 +228,14 @@ namespace DataLayer.MSSQLDB.Conversion
 
             return new Models.SystemModels.Purchaser(
                 purchaser.User.Id,
-                purchaser.User.Username,
-                purchaser.User.Email,
-                purchaser.User.Password,
-                purchaser.User.FirstName,
-                purchaser.User.LastName,
+                purchaser.User.Username.Trim(),
+                purchaser.User.Email.Trim(),
+                purchaser.User.Password.Trim(),
+                purchaser.User.FirstName.Trim(),
+                purchaser.User.LastName.Trim(),
                 purchaser.User.DateOfBirth,
-                purchaser.User.Address,
-                purchaser.User.PicturePath,
+                purchaser.User.Address.Trim(),
+                purchaser.User.PicturePath.Trim(),
                 prevPurchs,
                 currPurch
                 );
@@ -219,8 +260,8 @@ namespace DataLayer.MSSQLDB.Conversion
                 purchase.Id,
                 prods,
                 purchase.TotalPrice,
-                purchase.Comment,
-                purchase.DeliverToAddress,
+                purchase.Comment.Trim(),
+                purchase.DeliverToAddress.Trim(),
                 (Models.SystemModels.PurhaseStatus)purchase.Status
                 );
         }
