@@ -32,6 +32,8 @@ namespace Models.SystemModels
 
         public UserType UType { get; set; }
 
+        public String Token { get; set; }
+
         public IUser() { }
 
         public IUser(

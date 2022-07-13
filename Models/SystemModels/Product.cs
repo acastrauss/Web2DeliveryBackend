@@ -16,6 +16,8 @@ namespace Models.SystemModels
             Ingredients = ingredients;
         }
 
+        public Product() { }
+
         public Product(Product rhs)
         {
             Name = rhs.Name;

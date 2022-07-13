@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DataLayer.DBModels;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Backend.Controllers
 {
@@ -15,12 +20,14 @@ namespace Backend.Controllers
     {
         private readonly object _context;
 
-        private readonly Models.IDBModels.ICRUD _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLUsersCRUD();
+        private Models.IDBModels.ICRUD _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLUsersCRUD();
         private readonly Models.IDBModels.IConversion _DBConvert = new DataLayer.MSSQLDB.Conversion.MSSQLConversion();
+        private readonly AppSettings _appSettings;
 
-        public IusersController()
+        public IusersController(DataLayer.DBModels.DeliveryDBContext con, IOptions<AppSettings> appSet)
         {
             _context = null;
+            _appSettings = appSet.Value;
         }
 
         // GET: api/Iusers
@@ -93,6 +100,40 @@ namespace Backend.Controllers
             {
                 var userDb = _DBConvert.ConvertIUserDB(u);
                 _DBCrud.Create(userDb);
+
+                var iuserSys = _DBConvert.ConvertIUserSystem(userDb);
+
+                Models.IDBModels.IDBModel specifUser = null;
+
+                switch (u.UType)
+                {
+                    case Models.SystemModels.UserType.ADMIN:
+                        _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLAdminCRUD();
+                        var admin = new Models.SystemModels.Admin(
+                                iuserSys.Id, iuserSys.Username, iuserSys.Email, iuserSys.Password, iuserSys.FirstName, iuserSys.LastName,
+                                iuserSys.DateOfBirth, iuserSys.Address, iuserSys.PicturePath
+                            );
+                        specifUser = _DBConvert.ConvertAdminDB(admin);
+                        break;
+                    case Models.SystemModels.UserType.DELIVERER:
+                        _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLDelivererCRUD();
+                        var deliv = new Models.SystemModels.Deliverer(
+                                iuserSys.Id, iuserSys.Username, iuserSys.Email, iuserSys.Password, iuserSys.FirstName, iuserSys.LastName,
+                                iuserSys.DateOfBirth, iuserSys.Address, iuserSys.PicturePath, Models.SystemModels.ApprovalStatus.ON_HOLD
+                            );
+                        specifUser = _DBConvert.ConvertDelivereDB(deliv);
+                        break;
+                    case Models.SystemModels.UserType.PURCHASER:
+                        _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLPurchaserCRUD();
+                        var purch = new Models.SystemModels.Purchaser(
+                                iuserSys.Id, iuserSys.Username, iuserSys.Email, iuserSys.Password, iuserSys.FirstName, iuserSys.LastName,
+                                iuserSys.DateOfBirth, iuserSys.Address, iuserSys.PicturePath
+                            );
+                        specifUser = _DBConvert.ConvertPurchaserDB(purch);
+                        break;
+                }
+
+                _DBCrud.Create(specifUser);
             }
             catch (Exception e)
             {
@@ -129,6 +170,36 @@ namespace Backend.Controllers
                 else
                 {
                     Models.SystemModels.IUser user = _DBConvert.ConvertIUserSystem(loggedUser);
+                    var role = String.Empty;
+                    switch (user.UType)
+                    {
+                        case Models.SystemModels.UserType.ADMIN:
+                            role = "admin";
+                            break;
+                        case Models.SystemModels.UserType.DELIVERER:
+                            role = "deliverer";
+                            break;
+                        case Models.SystemModels.UserType.PURCHASER:
+                            role = "purchaser";
+                            break;
+                    }
+
+                    var tokenDescriptor = new SecurityTokenDescriptor
+                    {
+                        Subject = new ClaimsIdentity(new Claim[]
+                       {
+                        new Claim(ClaimTypes.Role, role)
+                       }),
+                        Expires = DateTime.UtcNow.AddDays(1),
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.JWT_Secret)), SecurityAlgorithms.HmacSha256Signature),
+                        Issuer = "https://localhost:5001",
+                        Audience = "https://localhost:44339/api/"
+                    };
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+                    var token = tokenHandler.WriteToken(securityToken);
+                    user.Token = token;
+
                     return user;
                 }
             }

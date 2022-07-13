@@ -136,3 +136,6 @@ D:\web2_proj\delivery\Delivery\Backend\obj\Debug\net5.0\Backend.dll
 D:\web2_proj\delivery\Delivery\Backend\obj\Debug\net5.0\ref\Backend.dll
 D:\web2_proj\delivery\Delivery\Backend\obj\Debug\net5.0\Backend.pdb
 D:\web2_proj\delivery\Delivery\Backend\obj\Debug\net5.0\Backend.genruntimeconfig.cache
+D:\web2_proj\delivery\Delivery\Backend\bin\Debug\net5.0\Microsoft.AspNetCore.JsonPatch.dll
+D:\web2_proj\delivery\Delivery\Backend\bin\Debug\net5.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+D:\web2_proj\delivery\Delivery\Backend\bin\Debug\net5.0\Newtonsoft.Json.Bson.dll
