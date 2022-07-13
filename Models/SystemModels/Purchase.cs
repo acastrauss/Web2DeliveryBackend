@@ -46,7 +46,7 @@ namespace Models.SystemModels
 
         // maybe add to config
         public float DeliveryPrice { get; } = 250.0f;
-        public float TotalPrice { get; private set; }
+        public double TotalPrice { get; set; }
         public String Comment { get; set; }
         public String Address { get; set; }
         public int Id { get; set; }

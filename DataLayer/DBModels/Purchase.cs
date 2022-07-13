@@ -15,7 +15,7 @@ namespace DataLayer.DBModels
         public int Id { get; set; }
         public string DeliverToAddress { get; set; }
         public string Comment { get; set; }
-        public float TotalPrice { get; set; }
+        public double TotalPrice { get; set; }
         public int? DeliveredBy { get; set; }
         public int? DeliveredTo { get; set; }
         public int? Status { get; set; }

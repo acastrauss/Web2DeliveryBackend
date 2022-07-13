@@ -167,7 +167,7 @@ namespace DataLayer.MSSQLDB.Conversion
                 throw new MSSQLConversionException();
             }
 
-            return new Models.SystemModels.Product(product.Name.Trim(), product.Price, product.Ingredients.Trim());
+            return new Models.SystemModels.Product(product.Name.Trim(), (float)product.Price, product.Ingredients.Trim());
         }
 
         public Models.IDBModels.IDBModel ConvertPurchaseDB(Models.SystemModels.Purchase model)
@@ -259,7 +259,7 @@ namespace DataLayer.MSSQLDB.Conversion
             return new Models.SystemModels.Purchase(
                 purchase.Id,
                 prods,
-                purchase.TotalPrice,
+                (float)purchase.TotalPrice,
                 purchase.Comment.Trim(),
                 purchase.DeliverToAddress.Trim(),
                 (Models.SystemModels.PurhaseStatus)purchase.Status

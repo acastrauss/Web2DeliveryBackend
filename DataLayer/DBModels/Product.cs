@@ -14,7 +14,7 @@ namespace DataLayer.DBModels
 
         public int Id { get; set; }
         public int AddedBy { get; set; }
-        public float Price { get; set; }
+        public double Price { get; set; }
         public string Name { get; set; }
         public string Ingredients { get; set; }
 

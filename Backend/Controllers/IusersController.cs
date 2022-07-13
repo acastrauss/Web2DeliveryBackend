@@ -40,18 +40,17 @@ namespace Backend.Controllers
 
         // GET: api/Iusers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Iuser>> GetIuser(int id)
+        public ActionResult<Models.SystemModels.IUser> GetIuser([FromRoute] int id)
         {
-            //var iuser = await _context.Iusers.FindAsync(id);
-
-            //if (iuser == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //return iuser;
-            return NotFound();
-
+            var userdb = _DBCrud.ReadById(id);
+            if(userdb != null)
+            {
+                return _DBConvert.ConvertIUserSystem(userdb);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
         // PUT: api/Iusers/5

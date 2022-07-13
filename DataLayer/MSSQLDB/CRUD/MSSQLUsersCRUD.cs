@@ -66,7 +66,14 @@ namespace DataLayer.MSSQLDB.CRUD
 
         public IDBModel ReadById(int id)
         {
-            throw new NotImplementedException();
+            DBModels.Iuser userDb = null;
+            
+            using (DBModels.DeliveryDBContext _context = new DBModels.DeliveryDBContext())
+            {
+                userDb = _context.Iusers.Where(x => x.Id == id).FirstOrDefault();
+            }
+
+            return userDb;
         }
 
         public IDBModel UpdateModel(IDBModel model)
