@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DataLayer.DBModels;
+using Newtonsoft.Json;
 
 namespace Backend.Controllers
 {
@@ -82,15 +83,25 @@ namespace Backend.Controllers
             return NoContent();
         }
 
+        class PurchaseWrapper
+        {
+            public Models.SystemModels.Purchase purchase { get; set; } = new Models.SystemModels.Purchase();
+            public int? deliveredBy { get; set; }
+            public int deliveredTo { get; set; }
+        }
+
         // POST: api/Purchases
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Purchase>> PostPurchase(Purchase purchase)
+        public ActionResult<Models.SystemModels.Purchase> PostPurchase([FromBody] object purchase)
         {
-            _context.Purchases.Add(purchase);
-            await _context.SaveChangesAsync();
+            var p = JsonConvert.DeserializeObject<PurchaseWrapper>(purchase.ToString());
+            var pdb = _DBConvert.ConvertPurchaseDB(p.purchase);
+            ((DataLayer.DBModels.Purchase)pdb).DeliveredTo = p.deliveredTo;
+            ((DataLayer.DBModels.Purchase)pdb).DeliveredBy = p.deliveredBy;
+            var purch = _DBConvert.ConvertPurchaseSystem(_DBCrud.Create(pdb));
 
-            return CreatedAtAction("GetPurchase", new { id = purchase.Id }, purchase);
+            return purch;
         }
 
         // DELETE: api/Purchases/5

@@ -1,4 +1,5 @@
-﻿using Models.IDBModels;
+﻿using Microsoft.EntityFrameworkCore;
+using Models.IDBModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -111,6 +112,7 @@ namespace DataLayer.MSSQLDB.Conversion
         {
             return new DBModels.Iuser()
             {
+                Id = (int)model.Id,
                 Address = model.Address,
                 DateOfBirth = model.DateOfBirth,
                 Email = model.Email,
@@ -167,7 +169,11 @@ namespace DataLayer.MSSQLDB.Conversion
                 throw new MSSQLConversionException();
             }
 
-            return new Models.SystemModels.Product(product.Name.Trim(), (float)product.Price, product.Ingredients.Trim());
+            var prod = new Models.SystemModels.Product(
+                product.Name.Trim(), (float)product.Price, product.Ingredients.Trim()
+            );
+            prod.Id = product.Id;
+            return prod;
         }
 
         public Models.IDBModels.IDBModel ConvertPurchaseDB(Models.SystemModels.Purchase model)
@@ -189,7 +195,10 @@ namespace DataLayer.MSSQLDB.Conversion
                 Id = model.Id,
                 Status = (int)model.Status,
                 TotalPrice = model.TotalPrice,
-                ConsistOfs = consOf
+                ConsistOfs = consOf,
+                CreatedAt = model.CreatedAt,
+                DeliveredAt = model.DeliveredAt,
+                DeliverToAddress = model.Address
             };
         }
 
@@ -251,12 +260,19 @@ namespace DataLayer.MSSQLDB.Conversion
             }
 
             var prods = new List<Models.SystemModels.Product>();
-            purchase.ConsistOfs.ToList().ForEach(co =>
-            {
-                prods.Add(this.ConvertProductSystem(co.Product));
-            });
 
-            return new Models.SystemModels.Purchase(
+            using (var _context = new DataLayer.DBModels.DeliveryDBContext())
+            {
+                var tempP = _context.Purchases.Include(x => x.ConsistOfs).ThenInclude(x => x.Product).Where(x => x.Id == purchase.Id);
+                tempP.ToList().ForEach(x => x.ConsistOfs.ToList().ForEach(c => prods.Add(ConvertProductSystem(c.Product))));
+            }
+
+            //purchase.ConsistOfs.ToList().ForEach(co =>
+            //{
+            //    prods.Add(this.ConvertProductSystem(co.Product));
+            //});
+
+            var pur = new Models.SystemModels.Purchase(
                 purchase.Id,
                 prods,
                 (float)purchase.TotalPrice,
@@ -264,6 +280,10 @@ namespace DataLayer.MSSQLDB.Conversion
                 purchase.DeliverToAddress.Trim(),
                 (Models.SystemModels.PurhaseStatus)purchase.Status
                 );
+
+            pur.DeliveredAt = purchase.DeliveredAt;
+            pur.CreatedAt = purchase.CreatedAt;
+            return pur;
         }
     }
 }

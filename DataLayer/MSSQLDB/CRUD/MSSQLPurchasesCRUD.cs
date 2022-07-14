@@ -12,7 +12,20 @@ namespace DataLayer.MSSQLDB.CRUD
     {
         public IDBModel Create(IDBModel model)
         {
-            throw new NotImplementedException();
+            var purchs = model as DBModels.Purchase;
+
+            if (purchs == null)
+            {
+                throw new MSSQLModelException();
+            }
+
+            using (DBModels.DeliveryDBContext _context = new DBModels.DeliveryDBContext())
+            {
+                _context.Purchases.Add(purchs);
+                _context.SaveChanges();
+            }
+
+            return purchs;
         }
 
         public IDBModel DeleteModel(int id)

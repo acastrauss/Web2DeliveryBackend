@@ -26,9 +26,16 @@ namespace Backend.Controllers
 
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public ActionResult<IEnumerable<Models.SystemModels.Product>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            var prodsDB = _DBCrud.ReadAll();
+            List<Models.SystemModels.Product> products = new List<Models.SystemModels.Product>();
+            prodsDB.ToList().ForEach(d =>
+            {
+                products.Add(_DBConvert.ConvertProductSystem(d));
+            });
+
+            return products;
         }
 
         // GET: api/Products/5

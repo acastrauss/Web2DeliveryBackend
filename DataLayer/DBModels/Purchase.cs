@@ -20,6 +20,9 @@ namespace DataLayer.DBModels
         public int? DeliveredTo { get; set; }
         public int? Status { get; set; }
 
+        public DateTime CreatedAt { get; set; }
+        public DateTime DeliveredAt { get; set; }
+
         public virtual Deliverer DeliveredByNavigation { get; set; }
         public virtual Purchaser DeliveredToNavigation { get; set; }
         public virtual ICollection<ConsistOf> ConsistOfs { get; set; }

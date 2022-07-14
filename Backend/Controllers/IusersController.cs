@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using Newtonsoft.Json;
 
 namespace Backend.Controllers
 {
@@ -55,33 +56,37 @@ namespace Backend.Controllers
 
         // PUT: api/Iusers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutIuser(int id, Iuser iuser)
+        [HttpPut]
+        public ActionResult<Models.SystemModels.IUser> PutIuser([FromBody] object iuser)
         {
-            //if (id != iuser.Id)
-            //{
-            //    return BadRequest();
-            //}
+            Models.SystemModels.IUser ubody = null;
+            bool passowrdChanged = false;
+            // if password didnt change
+            try
+            {
+                ubody = JsonConvert.DeserializeObject<Models.SystemModels.IUser>(iuser.ToString());
+                passowrdChanged = !ubody.Password.Equals(String.Empty);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
 
-            //_context.Entry(iuser).State = EntityState.Modified;
+            var currentUdb = _DBCrud.ReadById((int)ubody.Id) as DataLayer.DBModels.Iuser;
+            if (currentUdb == null) return NotFound();
 
-            //try
-            //{
-            //    await _context.SaveChangesAsync();
-            //}
-            //catch (DbUpdateConcurrencyException)
-            //{
-            //    if (!IuserExists(id))
-            //    {
-            //        return NotFound();
-            //    }
-            //    else
-            //    {
-            //        throw;
-            //    }
-            //}
+            if (!passowrdChanged)
+            {
+                ubody.Password = currentUdb.Password;
+            }
+            ubody.DateOfBirth = currentUdb.DateOfBirth;
 
-            return NoContent();
+            var userDb = _DBConvert.ConvertIUserDB(ubody);
+
+            var newUserDb = _DBCrud.UpdateModel(userDb);
+
+            if (newUserDb == null) return NotFound();
+            else return Ok(newUserDb);
         }
 
         // POST: api/Iusers

@@ -42,6 +42,7 @@ namespace Models.SystemModels
             Status = rhs.Status;
         }
 
+        public Purchase() { }
         public List<Product> PurchaseItems { get; set; }
 
         // maybe add to config
@@ -51,6 +52,8 @@ namespace Models.SystemModels
         public String Address { get; set; }
         public int Id { get; set; }
         public PurhaseStatus Status { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime DeliveredAt { get; set; }
 
         public float CalculateTotalPrice()
         {

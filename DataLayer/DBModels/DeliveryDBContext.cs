@@ -172,6 +172,10 @@ namespace DataLayer.DBModels
                     .HasMaxLength(50)
                     .IsFixedLength(true);
 
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+                entity.Property(e => e.DeliveredAt).HasColumnType("datetime");
+
+
                 entity.HasOne(d => d.DeliveredByNavigation)
                     .WithMany(p => p.Purchases)
                     .HasForeignKey(d => d.DeliveredBy)

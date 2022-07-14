@@ -34,7 +34,14 @@ namespace DataLayer.MSSQLDB.CRUD
 
         public ICollection<IDBModel> ReadAll()
         {
-            throw new NotImplementedException();
+            var prods = new List<IDBModel>();
+
+            using (var _context = new DBModels.DeliveryDBContext())
+            {
+                _context.Products.ToList().ForEach(p => prods.Add(p));
+            }
+
+            return prods;
         }
 
         public IDBModel ReadById(int id)

@@ -78,7 +78,27 @@ namespace DataLayer.MSSQLDB.CRUD
 
         public IDBModel UpdateModel(IDBModel model)
         {
-            throw new NotImplementedException();
+            var userDb = model as DBModels.Iuser;
+
+            if (userDb == null)
+            {
+                throw new MSSQLModelException();
+            }
+
+            using (DBModels.DeliveryDBContext _context = new DBModels.DeliveryDBContext())
+            {
+                if(_context.Iusers.Where(x => x.Id == userDb.Id).Count() > 0)
+                {
+                    _context.Entry(userDb).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    userDb = null;
+                }
+            }
+
+            return userDb;
         }
     }
 }
