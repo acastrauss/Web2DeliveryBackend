@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DataLayer.DBModels;
 using Newtonsoft.Json;
+using Aspose.Email;
+using Aspose.Email.Clients.Smtp;
+using Aspose.Email.Clients;
 
 namespace Backend.Controllers
 {
@@ -79,6 +82,38 @@ namespace Backend.Controllers
         public ActionResult<bool> ChangeStatus([FromBody]object statusChange)
         {
             var scd = JsonConvert.DeserializeObject<StatusChangeData>(statusChange.ToString());
+            MailMessage message = new MailMessage();
+
+            // Set subject of the message, body and sender information
+            message.Subject = "Approval";
+            message.Body = scd.status == 0 ? "Your profile is approved" : "Your profile is blocked";
+            message.From = new MailAddress("acastrauss@hotmail.com", "Aleksandar Stamenkovic", false);
+
+            // Add To recipients and CC recipients
+            message.To.Add(new MailAddress("acastrauss@hotmail.com", "Aleksandar Stamenkovic", false));
+
+            // Save message in EML, EMLX, MSG and MHTML formats
+            message.Save("EmailMessage.eml", SaveOptions.DefaultEml);
+            message.Save("EmailMessage.emlx", SaveOptions.CreateSaveOptions(MailMessageSaveType.EmlxFormat));
+            message.Save("EmailMessage.msg", SaveOptions.DefaultMsgUnicode);
+            message.Save("EmailMessage.mhtml", SaveOptions.DefaultMhtml);
+            SmtpClient client = new SmtpClient();
+
+            // Specify your mailing Host, Username, Password, Port # and Security option
+            client.Host = "smtp-mail.outlook.com";
+            client.Username = "acastrauss@hotmail.com";
+            client.Password = "delijesever1989";
+            client.Port = 587;
+            client.SecurityOptions = SecurityOptions.SSLExplicit;
+            try
+            {
+                // Send this email
+                client.Send(message);
+            }
+            catch (Exception ex)
+            {
+            }
+
             return ((DataLayer.MSSQLDB.CRUD.MSSQLDelivererCRUD)_DBCrud).ChangeStatus(
                 scd.id, (Models.SystemModels.ApprovalStatus)scd.status, scd.adminId);
         }
