@@ -38,18 +38,33 @@ namespace Backend.Controllers
             return deliverers;
         }
 
+
+        //// GET: api/Deliverers/5
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<Deliverer>> GetDeliverer(int id)
+        //{
+        //    var deliverer = await _context.Deliverers.FindAsync(id);
+
+        //    if (deliverer == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return deliverer;
+        //}
+
         // GET: api/Deliverers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Deliverer>> GetDeliverer(int id)
+        //[Route("GetDelivererApproved")]
+        public ActionResult<bool> GetDeliverer(int id)
         {
-            var deliverer = await _context.Deliverers.FindAsync(id);
-
-            if (deliverer == null)
+            var delivDb = _DBCrud.ReadById(id) as DataLayer.DBModels.Deliverer;
+            if(delivDb == null)
             {
                 return NotFound();
             }
 
-            return deliverer;
+            return delivDb.ApprovalStatus == (int)Models.SystemModels.ApprovalStatus.APPROVED; ;
         }
 
         class StatusChangeData

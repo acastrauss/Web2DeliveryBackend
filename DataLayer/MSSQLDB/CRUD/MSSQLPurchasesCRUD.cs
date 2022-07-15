@@ -39,7 +39,30 @@ namespace DataLayer.MSSQLDB.CRUD
 
             using (DBModels.DeliveryDBContext _context = new DBModels.DeliveryDBContext())
             {
-                _context.Purchases.Include(x => x.ConsistOfs).ThenInclude(x => x.Product).ToList().ForEach(p => purchs.Add(p));
+                _context.Purchases.Include(x => x.ConsistOfs).ThenInclude(x => x.Product).ToList().ForEach(p => {
+
+                    var delivBy = p.DeliveredBy;
+
+                    if(delivBy == null)
+                    {
+                        purchs.Add(p);
+                    }
+                    else
+                    {
+                        var deliv = _context.Deliverers.Where(x => x.UserId == delivBy).FirstOrDefault();
+                        if(deliv != null)
+                        {
+                            if(deliv.ApprovalStatus == 0) // if it's approved
+                            {
+                                purchs.Add(p);
+                            }
+                        }
+                        else
+                        {
+                            purchs.Add(p);
+                        }
+                    }
+                });
             }
 
             return purchs;

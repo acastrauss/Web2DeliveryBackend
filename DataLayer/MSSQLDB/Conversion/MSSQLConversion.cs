@@ -119,7 +119,7 @@ namespace DataLayer.MSSQLDB.Conversion
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Password = model.Password,
-                PicturePath = "Nista",
+                PicturePath = model.PicturePath,
                 Username = model.Username,
                 UserType = (int)model.UType
             };

@@ -12,6 +12,8 @@ using System.Security.Claims;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Newtonsoft.Json;
+using System.Net.Http;
+using System.IO;
 
 namespace Backend.Controllers
 {
@@ -29,6 +31,47 @@ namespace Backend.Controllers
         {
             _context = null;
             _appSettings = appSet.Value;
+        }
+
+        [HttpPost]
+        [Route("AddImage")]
+        public async Task<ActionResult<String>> AddImage([FromForm] IFormCollection idobj)
+        {
+            if(idobj.Files.Count == 0)
+            {
+                return BadRequest();
+            }
+
+            var f = idobj.Files[0];
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "imgs", f.FileName);
+
+            using (Stream stream = f.OpenReadStream())
+            {
+                using (FileStream fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
+                {
+                    while (stream.Position < stream.Length)
+                    {
+                        fileStream.WriteByte((byte)stream.ReadByte());
+                    }
+                }
+            }
+
+            //var img = idobj as IFormFile;
+            //if (img == null || img.Length == 0)
+            //{
+            //    return Content("File not selected");
+            //}
+            ////Set the image location under WWWRoot folder. For example if you have the folder name image then you should set "image" in "FolderNameOfYourWWWRoot"
+            ////Saving the image in that folder 
+            //using (FileStream stream = new FileStream(path, FileMode.Create))
+            //{
+            //    await img.CopyToAsync(stream);
+            //    stream.Close();
+            //}
+
+            //Setting Image name in your product DTO
+            //If you want to save image name then do like this But if you want to save image location then write assign the path 
+            return Ok(JsonConvert.SerializeObject(path));
         }
 
         // GET: api/Iusers
@@ -61,11 +104,13 @@ namespace Backend.Controllers
         {
             Models.SystemModels.IUser ubody = null;
             bool passowrdChanged = false;
+            bool pictureChanged = false;
             // if password didnt change
             try
             {
                 ubody = JsonConvert.DeserializeObject<Models.SystemModels.IUser>(iuser.ToString());
                 passowrdChanged = !ubody.Password.Equals(String.Empty);
+                pictureChanged = !ubody.PicturePath.Equals(String.Empty);
             }
             catch (Exception)
             {
@@ -79,6 +124,11 @@ namespace Backend.Controllers
             {
                 ubody.Password = currentUdb.Password;
             }
+            if (!pictureChanged)
+            {
+                ubody.PicturePath = currentUdb.PicturePath;
+            }
+
             ubody.DateOfBirth = currentUdb.DateOfBirth;
 
             var userDb = _DBConvert.ConvertIUserDB(ubody);
