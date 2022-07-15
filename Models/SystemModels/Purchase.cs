@@ -55,6 +55,8 @@ namespace Models.SystemModels
         public DateTime CreatedAt { get; set; }
         public DateTime DeliveredAt { get; set; }
 
+        public int? DeliveredBy { get; set; }
+        public int? OrderedBy { get; set; }
         public float CalculateTotalPrice()
         {
             float totalPrice = 0;

@@ -198,7 +198,9 @@ namespace DataLayer.MSSQLDB.Conversion
                 ConsistOfs = consOf,
                 CreatedAt = model.CreatedAt,
                 DeliveredAt = model.DeliveredAt,
-                DeliverToAddress = model.Address
+                DeliverToAddress = model.Address,
+                DeliveredBy = model.DeliveredBy,
+                DeliveredTo = model.OrderedBy
             };
         }
 
@@ -283,6 +285,8 @@ namespace DataLayer.MSSQLDB.Conversion
 
             pur.DeliveredAt = purchase.DeliveredAt;
             pur.CreatedAt = purchase.CreatedAt;
+            pur.DeliveredBy = purchase.DeliveredBy;
+            pur.OrderedBy = purchase.DeliveredTo;
             return pur;
         }
     }

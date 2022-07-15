@@ -104,6 +104,54 @@ namespace Backend.Controllers
             return purch;
         }
 
+        class PurchaseAcceptData
+        {
+            public int purchaseId { get; set; }
+            public int delivererId { get; set; }
+        }
+
+        [HttpPost]
+        [Route("AcceptPurchase")]
+
+        public ActionResult<Models.SystemModels.Purchase> AcceptPurchase([FromBody] object purchase)
+        {
+            var pad = JsonConvert.DeserializeObject<PurchaseAcceptData>(purchase.ToString());
+            var currPurch = _DBCrud.ReadById(pad.purchaseId) as DataLayer.DBModels.Purchase;
+            if(currPurch == null)
+            {
+                return NotFound();
+            }
+
+            var rand = new Random();
+
+            currPurch.Status = (int)Models.SystemModels.PurhaseStatus.ACCEPTED;
+            currPurch.DeliveredAt = DateTime.Now.AddSeconds(rand.Next() % 50 + 10);
+            currPurch.DeliveredBy = pad.delivererId;
+            return _DBConvert.ConvertPurchaseSystem(_DBCrud.UpdateModel(currPurch));
+        }
+
+        class FinishPurchaseData
+        {
+            public int purchaseId { get; set; }
+        }
+
+        [HttpPost]
+        [Route("FinishPurchase")]
+        public ActionResult<Models.SystemModels.Purchase> FinishPurchase([FromBody] object purchase)
+        {
+            var pad = JsonConvert.DeserializeObject<FinishPurchaseData>(purchase.ToString());
+            var currPurch = _DBCrud.ReadById(pad.purchaseId) as DataLayer.DBModels.Purchase;
+            if (currPurch == null)
+            {
+                return NotFound();
+            }
+
+            var rand = new Random();
+
+            currPurch.Status = (int)Models.SystemModels.PurhaseStatus.DELIVERED;
+            return _DBConvert.ConvertPurchaseSystem(_DBCrud.UpdateModel(currPurch));
+        }
+
         // DELETE: api/Purchases/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePurchase(int id)
