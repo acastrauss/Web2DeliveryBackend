@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Aspose.Email;
 using Aspose.Email.Clients.Smtp;
 using Aspose.Email.Clients;
+using Microsoft.Extensions.Options;
 
 namespace Backend.Controllers
 {
@@ -20,11 +21,14 @@ namespace Backend.Controllers
         private readonly DeliveryDBContext _context;
 
         private Models.IDBModels.ICRUD _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLDelivererCRUD();
-        private readonly Models.IDBModels.IConversion _DBConvert = new DataLayer.MSSQLDB.Conversion.MSSQLConversion();
+        private readonly Models.IDBModels.IConversion _DBConvert; /*= new DataLayer.MSSQLDB.Conversion.MSSQLConversion();*/
+        private readonly AppSettings _appSettings;
 
-        public DeliverersController(DeliveryDBContext context)
+        public DeliverersController(DeliveryDBContext context, IOptions<AppSettings> appSet, Models.IDBModels.IConversion _convert)
         {
             _context = context;
+            _appSettings = appSet.Value;
+            _DBConvert = _convert;
         }
 
         // GET: api/Deliverers
@@ -87,10 +91,10 @@ namespace Backend.Controllers
             // Set subject of the message, body and sender information
             message.Subject = "Approval";
             message.Body = scd.status == 0 ? "Your profile is approved" : "Your profile is blocked";
-            message.From = new MailAddress("acastrauss@hotmail.com", "Aleksandar Stamenkovic", false);
+            message.From = new MailAddress(_appSettings.Email, _appSettings.EmailSenderName, false);
 
             // Add To recipients and CC recipients
-            message.To.Add(new MailAddress("acastrauss@hotmail.com", "Aleksandar Stamenkovic", false));
+            message.To.Add(new MailAddress(_appSettings.Email, _appSettings.EmailSenderName, false));
 
             // Save message in EML, EMLX, MSG and MHTML formats
             message.Save("EmailMessage.eml", SaveOptions.DefaultEml);
@@ -100,9 +104,9 @@ namespace Backend.Controllers
             SmtpClient client = new SmtpClient();
 
             // Specify your mailing Host, Username, Password, Port # and Security option
-            client.Host = "smtp-mail.outlook.com";
-            client.Username = "acastrauss@hotmail.com";
-            client.Password = "delijesever1989";
+            client.Host = _appSettings.EmailHost;
+            client.Username = _appSettings.Email;
+            client.Password = _appSettings.EmailPassword;
             client.Port = 587;
             client.SecurityOptions = SecurityOptions.SSLExplicit;
             try

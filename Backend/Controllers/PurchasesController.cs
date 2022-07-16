@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DataLayer.DBModels;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Options;
 
 namespace Backend.Controllers
 {
@@ -17,11 +18,12 @@ namespace Backend.Controllers
         private readonly DeliveryDBContext _context;
 
         private Models.IDBModels.ICRUD _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLPurchasesCRUD();
-        private readonly Models.IDBModels.IConversion _DBConvert = new DataLayer.MSSQLDB.Conversion.MSSQLConversion();
+        private readonly Models.IDBModels.IConversion _DBConvert;/*= new DataLayer.MSSQLDB.Conversion.MSSQLConversion();*/
 
-        public PurchasesController(DeliveryDBContext context)
+        public PurchasesController(DeliveryDBContext context, Models.IDBModels.IConversion _convert)
         {
             _context = context;
+            _DBConvert = _convert;
         }
 
         // GET: api/Purchases

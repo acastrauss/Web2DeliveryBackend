@@ -24,13 +24,14 @@ namespace Backend.Controllers
         private readonly object _context;
 
         private Models.IDBModels.ICRUD _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLUsersCRUD();
-        private readonly Models.IDBModels.IConversion _DBConvert = new DataLayer.MSSQLDB.Conversion.MSSQLConversion();
+        private readonly Models.IDBModels.IConversion _DBConvert; /*= new DataLayer.MSSQLDB.Conversion.MSSQLConversion();*/
         private readonly AppSettings _appSettings;
 
-        public IusersController(DataLayer.DBModels.DeliveryDBContext con, IOptions<AppSettings> appSet)
+        public IusersController(DataLayer.DBModels.DeliveryDBContext con, IOptions<AppSettings> appSet, Models.IDBModels.IConversion _convert)
         {
             _context = null;
             _appSettings = appSet.Value;
+            _DBConvert = _convert;
         }
 
         [HttpPost]

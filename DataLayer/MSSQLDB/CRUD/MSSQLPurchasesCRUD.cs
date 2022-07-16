@@ -8,8 +8,15 @@ using System.Threading.Tasks;
 
 namespace DataLayer.MSSQLDB.CRUD
 {
+    public class LockPurchaseContext
+    {
+        public int nothing { get; set; }
+    }
+
     public class MSSQLPurchasesCRUD : Models.IDBModels.ICRUD
     {
+        private static LockPurchaseContext lpc = new LockPurchaseContext();
+
         public IDBModel Create(IDBModel model)
         {
             var purchs = model as DBModels.Purchase;
@@ -89,18 +96,22 @@ namespace DataLayer.MSSQLDB.CRUD
                 throw new MSSQLModelException();
             }
 
-            using (DBModels.DeliveryDBContext _context = new DBModels.DeliveryDBContext())
+            lock (lpc)
             {
-                if (_context.Purchases.Where(x => x.Id == purch.Id).Count() > 0)
+                using (DBModels.DeliveryDBContext _context = new DBModels.DeliveryDBContext())
                 {
-                    _context.Entry(purch).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                    _context.SaveChanges();
-                }
-                else
-                {
-                    purch = null;
+                    if (_context.Purchases.Where(x => x.Id == purch.Id).Count() > 0)
+                    {
+                        _context.Entry(purch).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                        _context.SaveChanges();
+                    }
+                    else
+                    {
+                        purch = null;
+                    }
                 }
             }
+
 
             return purch;
         }
