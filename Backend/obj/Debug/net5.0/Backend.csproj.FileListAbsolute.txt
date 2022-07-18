@@ -143,3 +143,5 @@ D:\web2_proj\delivery\Delivery\Backend\bin\Debug\net5.0\System.Net.Http.Formatti
 D:\web2_proj\delivery\Delivery\Backend\bin\Debug\net5.0\Aspose.Email.dll
 D:\web2_proj\delivery\Delivery\Backend\bin\Debug\net5.0\System.Security.Cryptography.Pkcs.dll
 D:\web2_proj\delivery\Delivery\Backend\bin\Debug\net5.0\runtimes\win\lib\netcoreapp3.0\System.Security.Cryptography.Pkcs.dll
+D:\web2_proj\delivery\Delivery\Backend\bin\Debug\net5.0\Services.dll
+D:\web2_proj\delivery\Delivery\Backend\bin\Debug\net5.0\Services.pdb

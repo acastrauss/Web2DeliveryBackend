@@ -2904,6 +2904,21 @@
         "runtime": {
           "bin/placeholder/Models.dll": {}
         }
+      },
+      "Services/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v5.0",
+        "dependencies": {
+          "Aspose.Email": "22.6.0",
+          "DataLayer": "1.0.0",
+          "Models": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Services.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Services.dll": {}
+        }
       }
     }
   },
@@ -9396,6 +9411,11 @@
       "type": "project",
       "path": "../Models/Models.csproj",
       "msbuildProject": "../Models/Models.csproj"
+    },
+    "Services/1.0.0": {
+      "type": "project",
+      "path": "../Services/Services.csproj",
+      "msbuildProject": "../Services/Services.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -9410,7 +9430,8 @@
       "Microsoft.EntityFrameworkCore.Tools >= 5.0.17",
       "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 5.0.2",
       "Models >= 1.0.0",
-      "Newtonsoft.Json >= 13.0.1"
+      "Newtonsoft.Json >= 13.0.1",
+      "Services >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -9457,6 +9478,9 @@
             },
             "D:\\web2_proj\\delivery\\Delivery\\Models\\Models.csproj": {
               "projectPath": "D:\\web2_proj\\delivery\\Delivery\\Models\\Models.csproj"
+            },
+            "D:\\web2_proj\\delivery\\Delivery\\Services\\Services.csproj": {
+              "projectPath": "D:\\web2_proj\\delivery\\Delivery\\Services\\Services.csproj"
             }
           }
         }

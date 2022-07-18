@@ -13,6 +13,8 @@ namespace Models.SystemModels
         PURCHASER = 2
     }
 
+    
+
     public static class InvalidDate
     {
         public static DateTime InvalidBirthDate = DateTime.Now.AddDays(200);

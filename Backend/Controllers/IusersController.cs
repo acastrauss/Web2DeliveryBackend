@@ -21,80 +21,62 @@ namespace Backend.Controllers
     [ApiController]
     public class IusersController : ControllerBase
     {
-        private readonly object _context;
+        private readonly Services.IUsersService _usersService;
+        private readonly Services.AppSettings _appSettings;
 
-        private Models.IDBModels.ICRUD _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLUsersCRUD();
-        private readonly Models.IDBModels.IConversion _DBConvert; /*= new DataLayer.MSSQLDB.Conversion.MSSQLConversion();*/
-        private readonly AppSettings _appSettings;
-
-        public IusersController(DataLayer.DBModels.DeliveryDBContext con, IOptions<AppSettings> appSet, Models.IDBModels.IConversion _convert)
+        public IusersController(Services.IUsersService usersService, IOptions<Services.AppSettings> options)
         {
-            _context = null;
-            _appSettings = appSet.Value;
-            _DBConvert = _convert;
+            _usersService = usersService;
+            _appSettings = options.Value;
         }
 
         [HttpPost]
         [Route("AddImage")]
-        public async Task<ActionResult<String>> AddImage([FromForm] IFormCollection idobj)
+        public ActionResult<String> AddImage([FromForm] IFormCollection idobj)
         {
-            if(idobj.Files.Count == 0)
+            try
+            {
+                if (idobj.Files.Count == 0)
+                {
+                    return BadRequest();
+                }
+                var f = idobj.Files[0];
+                var imgName = f.FileName;
+                List<byte> imgBytes = new List<byte>();
+                
+                using (Stream stream = f.OpenReadStream())
+                {
+                    imgBytes.Add((byte)stream.ReadByte());    
+                }
+
+                var imgPath = _usersService.AddImage(imgBytes, imgName);
+                if(imgPath != null)
+                {
+                    return Ok(JsonConvert.SerializeObject(imgPath));
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception e)
             {
                 return BadRequest();
             }
-
-            var f = idobj.Files[0];
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "imgs", f.FileName);
-
-            using (Stream stream = f.OpenReadStream())
-            {
-                using (FileStream fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
-                {
-                    while (stream.Position < stream.Length)
-                    {
-                        fileStream.WriteByte((byte)stream.ReadByte());
-                    }
-                }
-            }
-
-            //var img = idobj as IFormFile;
-            //if (img == null || img.Length == 0)
-            //{
-            //    return Content("File not selected");
-            //}
-            ////Set the image location under WWWRoot folder. For example if you have the folder name image then you should set "image" in "FolderNameOfYourWWWRoot"
-            ////Saving the image in that folder 
-            //using (FileStream stream = new FileStream(path, FileMode.Create))
-            //{
-            //    await img.CopyToAsync(stream);
-            //    stream.Close();
-            //}
-
-            //Setting Image name in your product DTO
-            //If you want to save image name then do like this But if you want to save image location then write assign the path 
-            return Ok(JsonConvert.SerializeObject(path));
-        }
-
-        // GET: api/Iusers
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Iuser>>> GetIusers()
-        {
-            //return await _context.Iusers.ToListAsync();
-            return NotFound();
         }
 
         // GET: api/Iusers/5
         [HttpGet("{id}")]
         public ActionResult<Models.SystemModels.IUser> GetIuser([FromRoute] int id)
         {
-            var userdb = _DBCrud.ReadById(id);
-            if(userdb != null)
+            var user = _usersService.GetUser(id);
+            if(user == null)
             {
-                return _DBConvert.ConvertIUserSystem(userdb);
+                return NotFound();
             }
             else
             {
-                return NotFound();
+                return user;
             }
         }
 
@@ -103,99 +85,43 @@ namespace Backend.Controllers
         [HttpPut]
         public ActionResult<Models.SystemModels.IUser> PutIuser([FromBody] object iuser)
         {
-            Models.SystemModels.IUser ubody = null;
-            bool passowrdChanged = false;
-            bool pictureChanged = false;
-            // if password didnt change
             try
             {
-                ubody = JsonConvert.DeserializeObject<Models.SystemModels.IUser>(iuser.ToString());
-                passowrdChanged = !ubody.Password.Equals(String.Empty);
-                pictureChanged = !ubody.PicturePath.Equals(String.Empty);
+                var ubody = JsonConvert.DeserializeObject<Models.SystemModels.IUser>(iuser.ToString());
+                var updated = _usersService.UpdateUser(ubody);
+                if(updated != null)
+                {
+                    return Ok(updated);
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
             catch (Exception)
             {
                 return BadRequest();
             }
-
-            var currentUdb = _DBCrud.ReadById((int)ubody.Id) as DataLayer.DBModels.Iuser;
-            if (currentUdb == null) return NotFound();
-
-            if (!passowrdChanged)
-            {
-                ubody.Password = currentUdb.Password;
-            }
-            if (!pictureChanged)
-            {
-                ubody.PicturePath = currentUdb.PicturePath;
-            }
-
-            ubody.DateOfBirth = currentUdb.DateOfBirth;
-
-            var userDb = _DBConvert.ConvertIUserDB(ubody);
-
-            var newUserDb = _DBCrud.UpdateModel(userDb);
-
-            if (newUserDb == null) return NotFound();
-            else return Ok(newUserDb);
         }
 
         // POST: api/Iusers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        public ActionResult<Iuser> PostIuser([FromBody] object iuser)
+        public ActionResult<Models.SystemModels.IUser> PostIuser([FromBody] object iuser)
         {
             var u = Newtonsoft.Json.JsonConvert.DeserializeObject<Models.SystemModels.IUser>(iuser.ToString());
-
-            if(u == null)
+            if (u == null)
             {
                 return BadRequest();
             }
-
-            try
+            var registered = _usersService.RegisterUser(u);
+            if(registered != null)
             {
-                var userDb = _DBConvert.ConvertIUserDB(u);
-                _DBCrud.Create(userDb);
-
-                var iuserSys = _DBConvert.ConvertIUserSystem(userDb);
-
-                Models.IDBModels.IDBModel specifUser = null;
-
-                switch (u.UType)
-                {
-                    case Models.SystemModels.UserType.ADMIN:
-                        _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLAdminCRUD();
-                        var admin = new Models.SystemModels.Admin(
-                                iuserSys.Id, iuserSys.Username, iuserSys.Email, iuserSys.Password, iuserSys.FirstName, iuserSys.LastName,
-                                iuserSys.DateOfBirth, iuserSys.Address, iuserSys.PicturePath
-                            );
-                        specifUser = _DBConvert.ConvertAdminDB(admin);
-                        break;
-                    case Models.SystemModels.UserType.DELIVERER:
-                        _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLDelivererCRUD();
-                        var deliv = new Models.SystemModels.Deliverer(
-                                iuserSys.Id, iuserSys.Username, iuserSys.Email, iuserSys.Password, iuserSys.FirstName, iuserSys.LastName,
-                                iuserSys.DateOfBirth, iuserSys.Address, iuserSys.PicturePath, Models.SystemModels.ApprovalStatus.ON_HOLD
-                            );
-                        specifUser = _DBConvert.ConvertDelivereDB(deliv);
-                        break;
-                    case Models.SystemModels.UserType.PURCHASER:
-                        _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLPurchaserCRUD();
-                        var purch = new Models.SystemModels.Purchaser(
-                                iuserSys.Id, iuserSys.Username, iuserSys.Email, iuserSys.Password, iuserSys.FirstName, iuserSys.LastName,
-                                iuserSys.DateOfBirth, iuserSys.Address, iuserSys.PicturePath
-                            );
-                        specifUser = _DBConvert.ConvertPurchaserDB(purch);
-                        break;
-                }
-
-                _DBCrud.Create(specifUser);
+                return Ok(registered);
             }
-            catch (Exception e)
+            else
             {
                 return BadRequest();
             }
-
-            return Ok();
         }
 
         [HttpPost]
@@ -203,87 +129,26 @@ namespace Backend.Controllers
         public ActionResult<Models.SystemModels.IUser> LoginUser([FromBody] object iuser)
         {
             var u = Newtonsoft.Json.JsonConvert.DeserializeObject<Models.SystemModels.IUser>(iuser.ToString());
-
             if (u == null)
             {
                 return BadRequest();
             }
 
-            try
+            var logged = _usersService.LoginUser(new Services.UserCredentialsLogin()
             {
-                var userDb = _DBConvert.ConvertIUserDB(u);
-                var loggedUser = ((DataLayer.MSSQLDB.CRUD.MSSQLUsersCRUD)_DBCrud).ExistsByEmailPassword(new DataLayer.MSSQLDB.CRUD.UserCredentialsCheck()
-                {
-                    Email = u.Email,
-                    Passowrd = u.Password
-                });
+                Email = u.Email,
+                Password = u.Password
+            },
+            _appSettings.JWT_Secret);
 
-                if(loggedUser == null)
-                {
-                    return BadRequest();
-                }
-                else
-                {
-                    Models.SystemModels.IUser user = _DBConvert.ConvertIUserSystem(loggedUser);
-                    var role = String.Empty;
-                    switch (user.UType)
-                    {
-                        case Models.SystemModels.UserType.ADMIN:
-                            role = "admin";
-                            break;
-                        case Models.SystemModels.UserType.DELIVERER:
-                            role = "deliverer";
-                            break;
-                        case Models.SystemModels.UserType.PURCHASER:
-                            role = "purchaser";
-                            break;
-                    }
-
-                    var tokenDescriptor = new SecurityTokenDescriptor
-                    {
-                        Subject = new ClaimsIdentity(new Claim[]
-                       {
-                        new Claim(ClaimTypes.Role, role)
-                       }),
-                        Expires = DateTime.UtcNow.AddDays(1),
-                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.JWT_Secret)), SecurityAlgorithms.HmacSha256Signature),
-                        Issuer = "https://localhost:5001",
-                        Audience = "https://localhost:44339/api/"
-                    };
-                    var tokenHandler = new JwtSecurityTokenHandler();
-                    var securityToken = tokenHandler.CreateToken(tokenDescriptor);
-                    var token = tokenHandler.WriteToken(securityToken);
-                    user.Token = token;
-
-                    return user;
-                }
-            }
-            catch (Exception e)
+            if(logged == null)
             {
-                return BadRequest();
+                return NotFound();
             }
-        }
-
-        // DELETE: api/Iusers/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteIuser(int id)
-        {
-            //var iuser = await _context.Iusers.FindAsync(id);
-            //if (iuser == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //_context.Iusers.Remove(iuser);
-            //await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool IuserExists(int id)
-        {
-            //return _context.Iusers.Any(e => e.Id == id);
-            return false;
+            else
+            {
+                return Ok(logged);
+            }
         }
     }
 }

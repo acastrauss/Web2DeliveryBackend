@@ -36,8 +36,39 @@ namespace Backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<Models.IDBModels.IConversion, DataLayer.MSSQLDB.Conversion.MSSQLConversion>();
+            services.AddScoped<Services.IEmailService, Services.EmailService>();
 
-            services.Configure<AppSettings>(Configuration.GetSection("ApplicationSettings"));
+            //Configuration.GetSection("ApplicationSettings")
+            services.Configure<Services.AppSettings>(Configuration.GetSection("ApplicationSettings"));
+
+            services.AddScoped<Services.IUsersService>(
+                x =>
+                    new Services.UsersService(
+                        x.GetRequiredService<Models.IDBModels.IConversion>()
+                        )
+                    );
+
+            services.AddScoped<Services.IDelivererService>(
+                x =>
+                new Services.DelivererService(
+                    x.GetRequiredService<Models.IDBModels.IConversion>(),
+                    x.GetRequiredService<Services.IEmailService>()
+                    )
+                );
+
+            services.AddScoped<Services.IProductService>(
+                x =>
+                new Services.ProductService(
+                    x.GetRequiredService<Models.IDBModels.IConversion>()
+                    )
+                );
+
+            services.AddScoped<Services.IPurchaseService>(
+                x =>
+                new Services.PurchaseService(
+                    x.GetRequiredService<Models.IDBModels.IConversion>()
+                    )
+                );
 
             services.Configure<FormOptions>(o =>
             {

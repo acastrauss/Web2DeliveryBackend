@@ -15,82 +15,18 @@ namespace Backend.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly DeliveryDBContext _context;
+        private readonly Services.IProductService _productService;
 
-        private Models.IDBModels.ICRUD _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLProductCRUD();
-        private readonly Models.IDBModels.IConversion _DBConvert; /*= new DataLayer.MSSQLDB.Conversion.MSSQLConversion();*/
-
-        public ProductsController(DeliveryDBContext context, Models.IDBModels.IConversion _convert)
+        public ProductsController(Services.IProductService productService)
         {
-            _context = context;
-            _DBConvert = _convert;
+            _productService = productService;
         }
 
         // GET: api/Products
         [HttpGet]
         public ActionResult<IEnumerable<Models.SystemModels.Product>> GetProducts()
         {
-            var prodsDB = _DBCrud.ReadAll();
-            List<Models.SystemModels.Product> products = new List<Models.SystemModels.Product>();
-            prodsDB.ToList().ForEach(d =>
-            {
-                products.Add(_DBConvert.ConvertProductSystem(d));
-            });
-
-            return products;
-        }
-
-        // GET: api/Products/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
-        {
-            var product = await _context.Products.FindAsync(id);
-
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return product;
-        }
-
-        // PUT: api/Products/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
-        {
-            if (id != product.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(product).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        class ProductWrapper
-        {
-            public Models.SystemModels.Product product { get; set; } = new Models.SystemModels.Product();
-            public int adminId { get; set; }
-
-            public ProductWrapper() {}
+            return Ok(_productService.GetAll());
         }
 
         // POST: api/Products
@@ -98,33 +34,10 @@ namespace Backend.Controllers
         [HttpPost]
         public ActionResult<Models.SystemModels.Product> PostProduct([FromBody] object product)
         {
-            var p = JsonConvert.DeserializeObject<ProductWrapper>(product.ToString());
-            var pdb = _DBConvert.ConvertProductDB(p.product);
-            ((DataLayer.DBModels.Product)pdb).AddedBy = p.adminId;
-            var prod = _DBConvert.ConvertProductSystem(_DBCrud.Create(pdb));
-
-            return prod;
+            var p = JsonConvert.DeserializeObject<Services.ProductWrapper>(product.ToString());
+            return _productService.CreateProduct(p);
         }
 
-        // DELETE: api/Products/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(int id)
-        {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.Id == id);
-        }
+        
     }
 }

@@ -2,10 +2,16 @@ D:\web2_proj\delivery\Delivery\Services\bin\Debug\net5.0\Services.deps.json
 D:\web2_proj\delivery\Delivery\Services\bin\Debug\net5.0\Services.dll
 D:\web2_proj\delivery\Delivery\Services\bin\Debug\net5.0\ref\Services.dll
 D:\web2_proj\delivery\Delivery\Services\bin\Debug\net5.0\Services.pdb
+D:\web2_proj\delivery\Delivery\Services\bin\Debug\net5.0\DataLayer.dll
+D:\web2_proj\delivery\Delivery\Services\bin\Debug\net5.0\Models.dll
+D:\web2_proj\delivery\Delivery\Services\bin\Debug\net5.0\DataLayer.pdb
+D:\web2_proj\delivery\Delivery\Services\bin\Debug\net5.0\Models.pdb
+D:\web2_proj\delivery\Delivery\Services\obj\Debug\net5.0\Services.csprojAssemblyReference.cache
 D:\web2_proj\delivery\Delivery\Services\obj\Debug\net5.0\Services.GeneratedMSBuildEditorConfig.editorconfig
 D:\web2_proj\delivery\Delivery\Services\obj\Debug\net5.0\Services.AssemblyInfoInputs.cache
 D:\web2_proj\delivery\Delivery\Services\obj\Debug\net5.0\Services.AssemblyInfo.cs
 D:\web2_proj\delivery\Delivery\Services\obj\Debug\net5.0\Services.csproj.CoreCompileInputs.cache
+D:\web2_proj\delivery\Delivery\Services\obj\Debug\net5.0\Services.csproj.CopyComplete
 D:\web2_proj\delivery\Delivery\Services\obj\Debug\net5.0\Services.dll
 D:\web2_proj\delivery\Delivery\Services\obj\Debug\net5.0\ref\Services.dll
 D:\web2_proj\delivery\Delivery\Services\obj\Debug\net5.0\Services.pdb
