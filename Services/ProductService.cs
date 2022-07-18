@@ -9,12 +9,13 @@ namespace Services
 {
     public class ProductService : IProductService
     {
-        private Models.IDBModels.ICRUD _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLProductCRUD();
+        private Models.IDBModels.ICRUD _DBCrud;/*= new DataLayer.MSSQLDB.CRUD.MSSQLProductCRUD();*/
         private readonly Models.IDBModels.IConversion _DBConvert; /*= new DataLayer.MSSQLDB.Conversion.MSSQLConversion();*/
 
-        public ProductService(Models.IDBModels.IConversion convert) 
+        public ProductService(Models.IDBModels.IConversion convert, Models.IDBModels.CRUDServiceResolver crudResolver) 
         {
             _DBConvert = convert;
+            _DBCrud = crudResolver(Models.IDBModels.CRUDServiceType.Product);
         }
 
         public Product CreateProduct(ProductWrapper productWrapper)

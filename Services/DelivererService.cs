@@ -9,14 +9,15 @@ namespace Services
 {
     public class DelivererService : IDelivererService
     {
-        private Models.IDBModels.ICRUD _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLDelivererCRUD();
+        private Models.IDBModels.ICRUD _DBCrud;/*= new DataLayer.MSSQLDB.CRUD.MSSQLDelivererCRUD();*/
         private readonly Models.IDBModels.IConversion _DBConvert; /*= new DataLayer.MSSQLDB.Conversion.MSSQLConversion();*/
         private readonly IEmailService _emailService;
 
-        public DelivererService(Models.IDBModels.IConversion conversion, IEmailService emailService)
+        public DelivererService(Models.IDBModels.IConversion conversion, IEmailService emailService, Models.IDBModels.CRUDServiceResolver crudResolver)
         {
             _DBConvert = conversion;
             _emailService = emailService;
+            _DBCrud = crudResolver(Models.IDBModels.CRUDServiceType.Deliverer);
         }
 
         public bool ChangeStatus(StatusChangeData scd, Services.EmailRequiredInfo eri)

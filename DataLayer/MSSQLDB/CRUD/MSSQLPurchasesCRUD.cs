@@ -26,10 +26,13 @@ namespace DataLayer.MSSQLDB.CRUD
                 throw new MSSQLModelException();
             }
 
-            using (DBModels.DeliveryDBContext _context = new DBModels.DeliveryDBContext())
+            lock (lpc)
             {
-                _context.Purchases.Add(purchs);
-                _context.SaveChanges();
+                using (DBModels.DeliveryDBContext _context = new DBModels.DeliveryDBContext())
+                {
+                    _context.Purchases.Add(purchs);
+                    _context.SaveChanges();
+                }
             }
 
             return purchs;
@@ -44,32 +47,35 @@ namespace DataLayer.MSSQLDB.CRUD
         {
             List<IDBModel> purchs = new List<IDBModel>();
 
-            using (DBModels.DeliveryDBContext _context = new DBModels.DeliveryDBContext())
+            lock (lpc)
             {
-                _context.Purchases.Include(x => x.ConsistOfs).ThenInclude(x => x.Product).ToList().ForEach(p => {
+                using (DBModels.DeliveryDBContext _context = new DBModels.DeliveryDBContext())
+                {
+                    _context.Purchases.Include(x => x.ConsistOfs).ThenInclude(x => x.Product).ToList().ForEach(p => {
 
-                    var delivBy = p.DeliveredBy;
+                        var delivBy = p.DeliveredBy;
 
-                    if(delivBy == null)
-                    {
-                        purchs.Add(p);
-                    }
-                    else
-                    {
-                        var deliv = _context.Deliverers.Where(x => x.UserId == delivBy).FirstOrDefault();
-                        if(deliv != null)
+                        if (delivBy == null)
                         {
-                            if(deliv.ApprovalStatus == 0) // if it's approved
+                            purchs.Add(p);
+                        }
+                        else
+                        {
+                            var deliv = _context.Deliverers.Where(x => x.UserId == delivBy).FirstOrDefault();
+                            if (deliv != null)
+                            {
+                                if (deliv.ApprovalStatus == 0) // if it's approved
+                                {
+                                    purchs.Add(p);
+                                }
+                            }
+                            else
                             {
                                 purchs.Add(p);
                             }
                         }
-                        else
-                        {
-                            purchs.Add(p);
-                        }
-                    }
-                });
+                    });
+                }
             }
 
             return purchs;
@@ -79,9 +85,12 @@ namespace DataLayer.MSSQLDB.CRUD
         {
             DataLayer.DBModels.Purchase purchase = null;
 
-            using (DBModels.DeliveryDBContext _context = new DBModels.DeliveryDBContext())
+            lock (lpc)
             {
-                purchase =_context.Purchases.Include(x => x.ConsistOfs).ThenInclude(x => x.Product).Where(x => x.Id == id).FirstOrDefault();
+                using (DBModels.DeliveryDBContext _context = new DBModels.DeliveryDBContext())
+                {
+                    purchase = _context.Purchases.Include(x => x.ConsistOfs).ThenInclude(x => x.Product).Where(x => x.Id == id).FirstOrDefault();
+                }
             }
 
             return purchase;

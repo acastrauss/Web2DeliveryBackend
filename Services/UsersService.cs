@@ -11,12 +11,13 @@ namespace Services
 {
     public class UsersService : IUsersService
     {
-        private Models.IDBModels.ICRUD _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLUsersCRUD();
+        private Models.IDBModels.ICRUD _DBCrud;/*= new DataLayer.MSSQLDB.CRUD.MSSQLUsersCRUD();*/
         private readonly Models.IDBModels.IConversion _DBConvert; /*= new DataLayer.MSSQLDB.Conversion.MSSQLConversion();*/
         
-        public UsersService(Models.IDBModels.IConversion conversion)
+        public UsersService(Models.IDBModels.IConversion conversion, Models.IDBModels.CRUDServiceResolver crudResolver)
         {
             _DBConvert = conversion;
+            _DBCrud = crudResolver(Models.IDBModels.CRUDServiceType.User);
         }
 
         public string AddImage(List<byte> image, String imgName)

@@ -10,12 +10,13 @@ namespace Services
 {
     public class PurchaseService : IPurchaseService
     {
-        private Models.IDBModels.ICRUD _DBCrud = new DataLayer.MSSQLDB.CRUD.MSSQLPurchasesCRUD();
+        private Models.IDBModels.ICRUD _DBCrud;/*= new DataLayer.MSSQLDB.CRUD.MSSQLPurchasesCRUD();*/
         private readonly Models.IDBModels.IConversion _DBConvert;/*= new DataLayer.MSSQLDB.Conversion.MSSQLConversion();*/
     
-        public PurchaseService(Models.IDBModels.IConversion _convert)
+        public PurchaseService(Models.IDBModels.IConversion _convert, Models.IDBModels.CRUDServiceResolver crudResolver)
         {
             _DBConvert = _convert;
+            _DBCrud = crudResolver(Models.IDBModels.CRUDServiceType.Purchase);
         }
 
         public Purchase AcceptPurchase(PurchaseAcceptData pad)

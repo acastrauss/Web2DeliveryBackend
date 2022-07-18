@@ -38,13 +38,43 @@ namespace Backend
             services.AddScoped<Models.IDBModels.IConversion, DataLayer.MSSQLDB.Conversion.MSSQLConversion>();
             services.AddScoped<Services.IEmailService, Services.EmailService>();
 
+            services.AddScoped<DataLayer.MSSQLDB.CRUD.MSSQLAdminCRUD>();
+            services.AddScoped<DataLayer.MSSQLDB.CRUD.MSSQLDelivererCRUD>();
+            services.AddScoped<DataLayer.MSSQLDB.CRUD.MSSQLProductCRUD>();
+            services.AddScoped<DataLayer.MSSQLDB.CRUD.MSSQLPurchaserCRUD>();
+            services.AddScoped<DataLayer.MSSQLDB.CRUD.MSSQLPurchasesCRUD>();
+            services.AddScoped<DataLayer.MSSQLDB.CRUD.MSSQLUsersCRUD>();
+            services.AddTransient<Models.IDBModels.CRUDServiceResolver>(
+                serviceProvider => serviceType =>
+                {
+                    switch (serviceType)
+                    {
+                        case Models.IDBModels.CRUDServiceType.User:
+                            return serviceProvider.GetService<DataLayer.MSSQLDB.CRUD.MSSQLUsersCRUD>();
+                        case Models.IDBModels.CRUDServiceType.Admin:
+                            return serviceProvider.GetService<DataLayer.MSSQLDB.CRUD.MSSQLAdminCRUD>();
+                        case Models.IDBModels.CRUDServiceType.Deliverer:
+                            return serviceProvider.GetService<DataLayer.MSSQLDB.CRUD.MSSQLDelivererCRUD>();
+                        case Models.IDBModels.CRUDServiceType.Purchaser:
+                            return serviceProvider.GetService<DataLayer.MSSQLDB.CRUD.MSSQLPurchaserCRUD>();
+                        case Models.IDBModels.CRUDServiceType.Product:
+                            return serviceProvider.GetService<DataLayer.MSSQLDB.CRUD.MSSQLProductCRUD>();
+                        case Models.IDBModels.CRUDServiceType.Purchase:
+                            return serviceProvider.GetService<DataLayer.MSSQLDB.CRUD.MSSQLPurchasesCRUD>();
+                        default:
+                            return null;
+                    }
+                }
+            );
+
             //Configuration.GetSection("ApplicationSettings")
             services.Configure<Services.AppSettings>(Configuration.GetSection("ApplicationSettings"));
 
             services.AddScoped<Services.IUsersService>(
                 x =>
                     new Services.UsersService(
-                        x.GetRequiredService<Models.IDBModels.IConversion>()
+                        x.GetRequiredService<Models.IDBModels.IConversion>(),
+                         x.GetRequiredService<Models.IDBModels.CRUDServiceResolver>()
                         )
                     );
 
@@ -52,21 +82,24 @@ namespace Backend
                 x =>
                 new Services.DelivererService(
                     x.GetRequiredService<Models.IDBModels.IConversion>(),
-                    x.GetRequiredService<Services.IEmailService>()
+                    x.GetRequiredService<Services.IEmailService>(),
+                    x.GetRequiredService<Models.IDBModels.CRUDServiceResolver>()
                     )
                 );
 
             services.AddScoped<Services.IProductService>(
                 x =>
                 new Services.ProductService(
-                    x.GetRequiredService<Models.IDBModels.IConversion>()
+                    x.GetRequiredService<Models.IDBModels.IConversion>(),
+                    x.GetRequiredService<Models.IDBModels.CRUDServiceResolver>()
                     )
                 );
 
             services.AddScoped<Services.IPurchaseService>(
                 x =>
                 new Services.PurchaseService(
-                    x.GetRequiredService<Models.IDBModels.IConversion>()
+                    x.GetRequiredService<Models.IDBModels.IConversion>(),
+                    x.GetRequiredService<Models.IDBModels.CRUDServiceResolver>()
                     )
                 );
 
